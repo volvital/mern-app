@@ -6,6 +6,7 @@ const auth = require('../middleware/auth.middleware')
 
 const router = Router()
 
+// /api/link/generate
 router.post('/generate', auth, async (req, res) => {
 	try {
 		const baseUrl = config.get('baseUrl')
@@ -26,6 +27,20 @@ router.post('/generate', auth, async (req, res) => {
 	}
 })
 
+// /api/link/delete
+router.delete('/delete', auth, async (req, res) => {
+	try {
+		const links = await Link.find({owner: req.user.userId})
+		const newLinks = links.filter( link => link.code !== req.body.code )
+		const link = links.find( link => link.code === req.body.code )
+		await link.deleteOne()
+		res.json(newLinks)
+	} catch (e) {
+		res.status(500).json({message: 'Error!!! Try again!!!'})
+	}
+})
+
+// /api/link/
 router.get('/', auth, async (req, res) => {
 	try {
 		const links = await Link.find({owner: req.user.userId})
@@ -35,6 +50,7 @@ router.get('/', auth, async (req, res) => {
 	}
 })
 
+// /api/link/:id
 router.get('/:id', auth, async (req, res) => {
 	try {
 		const link = await Link.findById(req.params.id)

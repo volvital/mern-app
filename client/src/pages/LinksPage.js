@@ -18,6 +18,15 @@ export const LinksPage = () => {
 		} catch (e) {}
 	}, [token, request])
 
+	const deleteLink = useCallback(async code => {
+		try {
+			const fetched = await request(`/api/link/delete`, 'DELETE', { code }, {
+				Authorization: `Bearer ${token}`
+			})
+			setLinks(fetched)
+		} catch (e) {}
+	}, [token, request])
+
 	useEffect(() => {
 		fetchLinks()
 	}, [fetchLinks])
@@ -28,7 +37,7 @@ export const LinksPage = () => {
 
 	return (
 		<>
-			{ !loading && links && <LinkLIst links={links} /> }
+			{ !loading && links && <LinkLIst links={links} onRemove={deleteLink} /> }
 		</>
 	)
 }
