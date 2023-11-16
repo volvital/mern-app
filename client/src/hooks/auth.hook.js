@@ -8,10 +8,11 @@ export const useAuth = () => {
 	const [userId, setUserId] = useState(null)
 
 	const login = useCallback((jwtToken, id) => {
+		const date = Date.now()
 		setToken(jwtToken)
 		setUserId(id)
 		localStorage.setItem(storageName, JSON.stringify({
-			userId: id, token: jwtToken
+			date, userId: id, token: jwtToken
 		}))
 	}, [])
 	
@@ -23,12 +24,16 @@ export const useAuth = () => {
 
 	useEffect(() => {
 		const data = JSON.parse(localStorage.getItem(storageName))
+		const compare = Date.now() - data?.date
 
-		if (data && data.token) {
+		if (compare > 3600000) {
+			logout()
+		} else if (data && data.token) {
 			login(data.token, data.userId)
 		}
+		
 		setReady(true)
-	}, [login])
+	}, [login, logout])
 	
 	return { login, logout, token, userId, ready }
 }
